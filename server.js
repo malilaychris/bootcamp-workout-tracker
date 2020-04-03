@@ -1,20 +1,27 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const path = require('path');
 
-const workouts = require('./routes/workouts.js');
-const db = require('./config/db.js');
+const db = require('./models');
+const api = require('./routes/workouts');
+
+const PORT = process.env.PORT || 3000;
 
 const app = express();
-let PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log('App listening on PORT ' + PORT);
-})
+});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname + '/public')));
 
-app.use(workouts);
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/workout', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false
+});
 
-db();
+//db(app);
+api(app);
